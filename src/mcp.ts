@@ -16,7 +16,7 @@ import type { TaxType } from './types/common.js';
 // Create MCP server
 const server = new McpServer({
   name: 'amego-invoice',
-  version: '1.4.1',
+  version: '1.4.2',
 });
 
 // Get config from environment variables
@@ -559,6 +559,34 @@ server.tool(
     } catch (error) {
       return {
         content: [{ type: 'text' as const, text: `查詢失敗: ${error instanceof Error ? error.message : String(error)}` }],
+        isError: true,
+      };
+    }
+  }
+);
+
+// Tool: Get invoice PDF URL
+server.tool(
+  'get_invoice_pdf',
+  'Get invoice PDF download URL (取得發票 PDF 網址)',
+  { invoiceNumber: z.string().describe('發票號碼（10碼，如 AB12345678）') },
+  async ({ invoiceNumber }) => {
+    try {
+      const client = createClient();
+      const url = await client.invoice.downloadPdf(invoiceNumber, { format: 'url' });
+
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            invoiceNumber,
+            pdfUrl: url,
+          }, null, 2),
+        }],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: 'text' as const, text: `取得 PDF 網址失敗: ${error instanceof Error ? error.message : String(error)}` }],
         isError: true,
       };
     }

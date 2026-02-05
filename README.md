@@ -307,7 +307,7 @@ export AMEGO_APP_KEY=sHeq7t8G1wiQvhAuIM27
 
 ### 方式一：一鍵安裝 (.mcpb)
 
-下載 [amego-invoice-1.4.1.mcpb](https://github.com/monospace-tw/amego-invoice/releases/latest) 後雙擊安裝，Claude Desktop 會提示輸入：
+下載 [amego-invoice-1.4.2.mcpb](https://github.com/monospace-tw/amego-invoice/releases/latest) 後雙擊安裝，Claude Desktop 會提示輸入：
 - 統一編號 (Tax ID)
 - APP Key
 

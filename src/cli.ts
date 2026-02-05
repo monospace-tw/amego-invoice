@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { writeFileSync } from 'node:fs';
 import { config } from 'dotenv';
 import { Command } from 'commander';
 import { AmegoClient } from './client.js';
@@ -593,6 +594,43 @@ invoice
       }
     } catch (error) {
       console.error('✗ 查詢失敗');
+      console.error(`  ${error instanceof Error ? error.message : String(error)}`);
+      process.exit(1);
+    }
+  });
+
+// 下載發票 PDF
+invoice
+  .command('pdf <invoiceNumber>')
+  .description('下載發票 PDF')
+  .option('-o, --output <path>', '輸出檔案路徑（預設: <發票號碼>.pdf）')
+  .option('--url', '僅顯示 PDF 網址，不下載')
+  .action(async (invoiceNumber: string, options: { output?: string; url?: boolean }) => {
+    try {
+      const client = createClient();
+
+      if (options.url) {
+        const url = await client.invoice.downloadPdf(invoiceNumber, { format: 'url' });
+        console.log(url);
+        return;
+      }
+
+      const pdfBuffer = await client.invoice.downloadPdf(invoiceNumber);
+
+      if (!(pdfBuffer instanceof Buffer)) {
+        console.error('✗ 下載失敗: 未取得 PDF 內容');
+        process.exit(1);
+      }
+
+      const outputPath = options.output || `${invoiceNumber}.pdf`;
+      writeFileSync(outputPath, pdfBuffer);
+
+      console.log('✓ PDF 下載成功');
+      console.log(`  發票號碼: ${invoiceNumber}`);
+      console.log(`  檔案: ${outputPath}`);
+      console.log(`  大小: ${(pdfBuffer.length / 1024).toFixed(1)} KB`);
+    } catch (error) {
+      console.error('✗ 下載失敗');
       console.error(`  ${error instanceof Error ? error.message : String(error)}`);
       process.exit(1);
     }
