@@ -14,6 +14,18 @@ export interface BarcodeValidationResponse {
 }
 
 /**
+ * 公司查詢 API 原始回應
+ */
+interface CompanyQueryRawResponse {
+  code: number;
+  msg: string;
+  data?: Array<{
+    ban: string;
+    name?: string;
+  }>;
+}
+
+/**
  * 公司查詢回應
  */
 export interface CompanyQueryResponse {
@@ -157,12 +169,23 @@ export class UtilityOperations {
    * @returns 公司資訊列表
    */
   async queryCompanyMany(taxIds: string[]): Promise<CompanyQueryResponse> {
-    return sendRequest<CompanyQueryResponse>(
+    const rawResponse = await sendRequest<CompanyQueryRawResponse>(
       this.client,
       this.config,
       '/json/ban_query',
-      taxIds.map((id) => ({ BAN: id }))
+      taxIds.map((id) => ({ ban: id }))
     );
+
+    // 轉換 API 回應格式
+    return {
+      code: rawResponse.code,
+      msg: rawResponse.msg,
+      data: rawResponse.data?.map((item) => ({
+        found: !!item.name,
+        name: item.name,
+        taxId: item.ban,
+      })),
+    };
   }
 
   /**

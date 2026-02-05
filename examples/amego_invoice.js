@@ -1,5 +1,11 @@
 /**
- * 光貿電子發票 API 範例 - Node.js
+ * 光貿電子發票 API 原始呼叫範例 - Node.js (原生 https)
+ *
+ * ⚠️  此範例展示原始 API 呼叫方式，僅供參考。
+ *     建議使用 SDK 進行開發，請參考：
+ *     - examples/basic.ts    - 基礎範例
+ *     - examples/advanced.ts - 進階範例
+ *
  * B2C - 開立發票
  */
 

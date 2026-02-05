@@ -1,11 +1,14 @@
 {
   "name": "@monospace-tw/amego-invoice",
-  "version": "1.0.0",
+  "version": "1.2.1",
   "description": "Taiwan E-Invoice SDK for Amego (光貿電子發票加值中心)",
   "type": "module",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/esm/index.d.ts",
+  "bin": {
+    "amego-invoice": "./dist/esm/cli.js"
+  },
   "exports": {
     ".": {
       "import": {
@@ -41,7 +44,8 @@
     "invoice",
     "發票",
     "電子發票",
-    "光貿"
+    "光貿",
+    "cli"
   ],
   "author": "TrunkStudio",
   "license": "MIT",
@@ -54,11 +58,12 @@
   },
   "dependencies": {
     "axios": "^1.6.0",
+    "commander": "^12.1.0",
     "zod": "^3.22.0"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
     "typescript": "^5.3.0",
-    "vitest": "^1.0.0",
-    "@types/node": "^20.0.0"
+    "vitest": "^1.0.0"
   }
 }

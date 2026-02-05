@@ -9,6 +9,8 @@ export interface CalculateAmountsOptions {
   buyerHasTaxId?: boolean;
   /** 稅率，預設 0.05 (5%) */
   taxRate?: number;
+  /** 商品價格是否為未稅價，預設 false（含稅） */
+  priceExclusive?: boolean;
 }
 
 /**
@@ -52,7 +54,7 @@ export function calculateInvoiceAmounts(
   items: ProductItem[],
   options: CalculateAmountsOptions = {}
 ): InvoiceAmounts {
-  const { buyerHasTaxId = false, taxRate = 0.05 } = options;
+  const { buyerHasTaxId = false, taxRate = 0.05, priceExclusive = false } = options;
 
   // 分類加總
   let taxableSum = 0; // TaxType = 1 (應稅)
@@ -82,11 +84,19 @@ export function calculateInvoiceAmounts(
 
   let taxAmount = 0;
 
-  // 打統編時需分拆稅額
-  if (buyerHasTaxId && salesAmount > 0) {
-    const divisor = 1 + taxRate;
-    taxAmount = salesAmount - Math.round(salesAmount / divisor);
-    salesAmount = salesAmount - taxAmount;
+  if (priceExclusive) {
+    // 未稅價模式：金額已是未稅，直接計算稅額
+    if (buyerHasTaxId && salesAmount > 0) {
+      taxAmount = Math.round(salesAmount * taxRate);
+    }
+    // 不打統編時，taxAmount = 0，但 TotalAmount 仍為未稅金額
+  } else {
+    // 含稅價模式（預設）：需從含稅金額分拆出稅額
+    if (buyerHasTaxId && salesAmount > 0) {
+      const divisor = 1 + taxRate;
+      taxAmount = salesAmount - Math.round(salesAmount / divisor);
+      salesAmount = salesAmount - taxAmount;
+    }
   }
 
   const totalAmount = salesAmount + freeTaxSalesAmount + zeroTaxSalesAmount + taxAmount;

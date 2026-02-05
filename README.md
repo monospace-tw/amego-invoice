@@ -267,6 +267,58 @@ try {
 }
 ```
 
+## CLI
+
+支援 npx 方式直接執行：
+
+```bash
+# 測試連線
+npx @monospace-tw/amego-invoice time
+
+# 查詢公司
+npx @monospace-tw/amego-invoice ban 28080623
+
+# 開立發票
+npx @monospace-tw/amego-invoice invoice create \
+  --buyer-id 0000000000 \
+  --buyer-name "消費者" \
+  --item "商品A:2:100" \
+  --item "商品B:1:50"
+
+# 查詢發票狀態
+npx @monospace-tw/amego-invoice invoice status AB12345678
+
+# 發票列表
+npx @monospace-tw/amego-invoice invoice list --limit 10
+```
+
+環境變數設定：
+
+```bash
+export AMEGO_TAX_ID=12345678
+export AMEGO_APP_KEY=sHeq7t8G1wiQvhAuIM27
+```
+
+## Examples
+
+完整範例請參考 `examples/` 目錄：
+
+- **[basic.ts](examples/basic.ts)** - 基礎範例：連線測試、查詢公司、開立 B2C/B2B 發票
+- **[advanced.ts](examples/advanced.ts)** - 進階範例：手機條碼載具、捐贈發票、未稅價計算、混合稅別、折讓作業
+
+執行範例：
+
+```bash
+npx tsx examples/basic.ts
+npx tsx examples/advanced.ts
+```
+
+其他語言的原始 API 呼叫範例（供參考）：
+- `examples/amego_invoice.php` - PHP
+- `examples/amego_invoice.py` - Python
+- `examples/AmegoInvoice.java` - Java
+- `examples/AmegoInvoice.cs` - C#
+
 ## Test Environment
 
 使用測試環境進行開發：
