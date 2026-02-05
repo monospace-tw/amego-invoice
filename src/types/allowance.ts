@@ -6,31 +6,38 @@ import type { StatusCode, ProductTaxType } from './common.js';
 export interface AllowanceProductItem {
   /** 原發票號碼 */
   OriginalInvoiceNumber: string;
-  /** 原發票日期 */
-  OriginalInvoiceDate: string;
-  /** 品名 */
+  /** 原發票日期 YYYYMMDD */
+  OriginalInvoiceDate: string | number;
+  /** 原品名，不可超過256字 */
   OriginalDescription: string;
   /** 數量 */
   Quantity: number | string;
   /** 單位 */
   Unit?: string;
-  /** 單價 */
+  /** 單價(不含稅) */
   UnitPrice: number | string;
-  /** 小計 */
+  /** 小計(不含稅) */
   Amount: number | string;
-  /** 課稅別 */
-  Tax: ProductTaxType;
+  /** 稅金 */
+  Tax: number | string;
+  /** 課稅別 1=應稅 2=零稅率 3=免稅 */
+  TaxType: ProductTaxType;
 }
 
 /**
  * 開立折讓請求資料
  */
 export interface CreateAllowanceRequest {
-  /** 折讓單號 */
+  /** 折讓單號，不可重複，不可超過16字 */
   AllowanceNumber: string;
-  /** 折讓日期 YYYY-MM-DD */
-  AllowanceDate: string;
-  /** 買方統一編號 */
+  /** 折讓日期 YYYYMMDD */
+  AllowanceDate: string | number;
+  /**
+   * 折讓類別
+   * 1=買方開立折讓證明單, 2=賣方折讓證明通知單
+   */
+  AllowanceType: '1' | '2' | 1 | 2;
+  /** 買方統一編號，沒有則填入 0000000000 */
   BuyerIdentifier: string;
   /** 買方名稱 */
   BuyerName: string;
@@ -40,11 +47,11 @@ export interface CreateAllowanceRequest {
   BuyerTelephoneNumber?: string;
   /** 買方電子信箱 */
   BuyerEmailAddress?: string;
-  /** 折讓商品明細 */
+  /** 折讓商品明細，最多 9999 筆 */
   ProductItem: AllowanceProductItem[];
-  /** 應稅銷售額合計 */
+  /** 營業稅額 */
   TaxAmount: number | string;
-  /** 總計 */
+  /** 金額合計(不含稅) */
   TotalAmount: number | string;
 }
 
@@ -149,8 +156,13 @@ export interface AllowanceListResponse {
  * 折讓檔案下載選項
  */
 export interface AllowanceFileOptions {
-  /** 輸出格式 */
-  format?: 'buffer' | 'base64';
+  /** 輸出格式: 'buffer' (預設), 'base64', 'url' (直接回傳下載連結) */
+  format?: 'buffer' | 'base64' | 'url';
+  /**
+   * 下載樣式 (預設: 0)
+   * 0=A4整張, 1=A4(地址+A5), 3=A5
+   */
+  downloadStyle?: 0 | 1 | 3;
 }
 
 /**

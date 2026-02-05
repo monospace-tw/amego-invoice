@@ -186,6 +186,11 @@ export interface InvoiceListOptions {
   page?: number;
   /** 每頁筆數 */
   pageSize?: number;
+  /**
+   * 日期篩選類型
+   * 1=發票開立日期, 2=發票上傳日期
+   */
+  dateSelect?: 1 | 2;
 }
 
 /**
@@ -209,8 +214,14 @@ export interface InvoiceListResponse {
  * 發票檔案下載選項
  */
 export interface InvoiceFileOptions {
-  /** 輸出格式 */
-  format?: 'buffer' | 'base64';
+  /** 輸出格式: 'buffer' (預設), 'base64', 'url' (直接回傳下載連結) */
+  format?: 'buffer' | 'base64' | 'url';
+  /**
+   * 下載樣式 (預設: 0)
+   * 有打統編: 0=A4整張, 1=A4(地址+A5), 2=A4(A5x2), 3=A5
+   * 沒有打統編: 0=A4整張(背面兌獎聯，需雙面列印)
+   */
+  downloadStyle?: 0 | 1 | 2 | 3;
 }
 
 /**

@@ -16,6 +16,8 @@ import type {
   CreateInvoiceWithNumberRequest,
 } from '../types/invoice.js';
 import type { ApiResponse } from '../types/common.js';
+import type { BatchConfig, BatchResult } from '../types/batch.js';
+import { processBatch, resolveBatchConfig } from './batch.js';
 
 /**
  * 發票操作類別
@@ -116,7 +118,10 @@ export class InvoiceOperations {
       this.client,
       this.config,
       '/json/invoice_query',
-      { InvoiceNumber: invoiceNumber }
+      {
+        type: 'invoice',
+        invoice_number: invoiceNumber,
+      }
     );
   }
 
@@ -128,7 +133,9 @@ export class InvoiceOperations {
    * @returns 發票列表
    */
   async list(options: InvoiceListOptions = {}): Promise<InvoiceListResponse> {
-    const data: Record<string, unknown> = {};
+    const data: Record<string, unknown> = {
+      date_select: options.dateSelect ?? 1, // 預設以發票開立日期篩選
+    };
 
     if (options.startDate) data.start_date = options.startDate;
     if (options.endDate) data.end_date = options.endDate;
@@ -149,28 +156,48 @@ export class InvoiceOperations {
    *
    * @param invoiceNumber - 發票號碼
    * @param options - 下載選項
-   * @returns PDF 內容（Buffer 或 base64 字串）
+   * @returns PDF 內容（Buffer、base64 字串或 URL）
    */
   async downloadPdf(
     invoiceNumber: string,
     options: InvoiceFileOptions = {}
   ): Promise<Buffer | string> {
-    const response = await sendRequest<{ code: number; msg: string; base64_data?: string }>(
+    const response = await sendRequest<{
+      code: number;
+      msg: string;
+      data?: { file_url: string };
+    }>(
       this.client,
       this.config,
       '/json/invoice_file',
-      { InvoiceNumber: invoiceNumber }
+      {
+        type: 'invoice',
+        invoice_number: invoiceNumber,
+        download_style: options.downloadStyle ?? 0,
+      }
     );
 
-    if (!response.base64_data) {
-      throw new Error('No PDF data returned');
+    if (!response.data?.file_url) {
+      throw new Error('No PDF URL returned');
     }
+
+    // 如果只要 URL，直接回傳
+    if (options.format === 'url') {
+      return response.data.file_url;
+    }
+
+    // 下載 PDF 檔案
+    const pdfResponse = await this.client.get<ArrayBuffer>(response.data.file_url, {
+      responseType: 'arraybuffer',
+    });
+
+    const pdfBuffer = Buffer.from(pdfResponse.data);
 
     if (options.format === 'base64') {
-      return response.base64_data;
+      return pdfBuffer.toString('base64');
     }
 
-    return Buffer.from(response.base64_data, 'base64');
+    return pdfBuffer;
   }
 
   /**
@@ -230,6 +257,27 @@ export class InvoiceOperations {
       this.config,
       '/json/f0401_custom',
       requestData
+    );
+  }
+
+  /**
+   * 批次開立發票
+   *
+   * @param invoices - 發票資料陣列
+   * @param config - 批次設定
+   * @returns 批次處理結果
+   */
+  async createMany(
+    invoices: CreateInvoiceRequest[],
+    config?: BatchConfig
+  ): Promise<BatchResult<CreateInvoiceResponse>> {
+    const resolvedConfig = resolveBatchConfig(config);
+
+    return processBatch(
+      invoices,
+      (invoice) => this.create(invoice),
+      resolvedConfig,
+      (invoice) => invoice.OrderId
     );
   }
 }

@@ -15,6 +15,8 @@ import type {
   AllowancePrintResponse,
 } from '../types/allowance.js';
 import type { ApiResponse } from '../types/common.js';
+import type { BatchConfig, BatchResult } from '../types/batch.js';
+import { processBatch, resolveBatchConfig } from './batch.js';
 
 /**
  * 折讓操作類別
@@ -33,11 +35,12 @@ export class AllowanceOperations {
    * @returns 折讓回應
    */
   async create(data: CreateAllowanceRequest): Promise<CreateAllowanceResponse> {
+    // API 要求 data 為陣列格式
     return sendRequest<CreateAllowanceResponse>(
       this.client,
       this.config,
       '/json/g0401',
-      data
+      [data]
     );
   }
 
@@ -148,28 +151,47 @@ export class AllowanceOperations {
    *
    * @param allowanceNumber - 折讓單號
    * @param options - 下載選項
-   * @returns PDF 內容（Buffer 或 base64 字串）
+   * @returns PDF 內容（Buffer、base64 字串或 URL）
    */
   async downloadPdf(
     allowanceNumber: string,
     options: AllowanceFileOptions = {}
   ): Promise<Buffer | string> {
-    const response = await sendRequest<{ code: number; msg: string; base64_data?: string }>(
+    const response = await sendRequest<{
+      code: number;
+      msg: string;
+      data?: { file_url: string };
+    }>(
       this.client,
       this.config,
       '/json/allowance_file',
-      { AllowanceNumber: allowanceNumber }
+      {
+        allowance_number: allowanceNumber,
+        download_style: options.downloadStyle ?? 0,
+      }
     );
 
-    if (!response.base64_data) {
-      throw new Error('No PDF data returned');
+    if (!response.data?.file_url) {
+      throw new Error('No PDF URL returned');
     }
+
+    // 如果只要 URL，直接回傳
+    if (options.format === 'url') {
+      return response.data.file_url;
+    }
+
+    // 下載 PDF 檔案
+    const pdfResponse = await this.client.get<ArrayBuffer>(response.data.file_url, {
+      responseType: 'arraybuffer',
+    });
+
+    const pdfBuffer = Buffer.from(pdfResponse.data);
 
     if (options.format === 'base64') {
-      return response.base64_data;
+      return pdfBuffer.toString('base64');
     }
 
-    return Buffer.from(response.base64_data, 'base64');
+    return pdfBuffer;
   }
 
   /**
@@ -204,6 +226,27 @@ export class AllowanceOperations {
       this.config,
       '/json/allowance_print',
       data
+    );
+  }
+
+  /**
+   * 批次開立折讓
+   *
+   * @param allowances - 折讓資料陣列
+   * @param config - 批次設定
+   * @returns 批次處理結果
+   */
+  async createMany(
+    allowances: CreateAllowanceRequest[],
+    config?: BatchConfig
+  ): Promise<BatchResult<CreateAllowanceResponse>> {
+    const resolvedConfig = resolveBatchConfig(config);
+
+    return processBatch(
+      allowances,
+      (allowance) => this.create(allowance),
+      resolvedConfig,
+      (allowance) => allowance.AllowanceNumber || 'unknown'
     );
   }
 }

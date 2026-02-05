@@ -67,3 +67,17 @@ export class AmegoTimeoutError extends AmegoError {
     this.timeout = timeout;
   }
 }
+
+/**
+ * 頻率限制超過錯誤
+ */
+export class RateLimitExceededError extends AmegoError {
+  /** 可重試的等待時間（毫秒） */
+  readonly retryAfter: number;
+
+  constructor(retryAfter: number) {
+    super(`Rate limit exceeded. Retry after ${retryAfter}ms`);
+    this.name = 'RateLimitExceededError';
+    this.retryAfter = retryAfter;
+  }
+}

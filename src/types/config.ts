@@ -1,3 +1,7 @@
+import type { RetryConfig, RetryConfigInternal } from './retry.js';
+import type { RateLimitConfig, RateLimitConfigInternal } from './rate-limit.js';
+import type { LogConfig, LogConfigInternal } from './logger.js';
+
 /**
  * Amego Client 設定選項
  */
@@ -12,6 +16,12 @@ export interface AmegoClientConfig {
   timeout?: number;
   /** 是否跳過時間同步，預設 false */
   skipTimeSync?: boolean;
+  /** 重試策略設定，設為 false 停用重試 */
+  retry?: RetryConfig | false;
+  /** 頻率限制設定，設為 false 停用限制 */
+  rateLimit?: RateLimitConfig | false;
+  /** 日誌設定 */
+  logger?: LogConfig;
 }
 
 /**
@@ -23,6 +33,9 @@ export interface AmegoClientConfigInternal {
   baseUrl: string;
   timeout: number;
   skipTimeSync: boolean;
+  retry: RetryConfigInternal | null;
+  rateLimit: RateLimitConfigInternal | null;
+  logger: LogConfigInternal;
 }
 
 /**
@@ -33,3 +46,6 @@ export const DEFAULT_CONFIG = {
   timeout: 30000,
   skipTimeSync: false,
 } as const;
+
+// Re-export types for convenience
+export type { RetryConfig, RateLimitConfig, LogConfig };

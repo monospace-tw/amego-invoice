@@ -19,8 +19,8 @@ const cacheMap = new Map<string, TimeSyncCache>();
 export async function syncServerTime(baseUrl: string): Promise<number> {
   const localBefore = Math.floor(Date.now() / 1000);
 
-  const response = await axios.get<{ time: number }>(`${baseUrl}/json/time`);
-  const serverTime = response.data.time;
+  const response = await axios.get<{ timestamp: number }>(`${baseUrl}/json/time`);
+  const serverTime = response.data.timestamp;
 
   const localAfter = Math.floor(Date.now() / 1000);
   const localTime = Math.floor((localBefore + localAfter) / 2);

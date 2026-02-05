@@ -76,7 +76,14 @@ export interface TrackInfoResponse {
  * 伺服器時間回應
  */
 export interface ServerTimeResponse {
-  time: number;
+  timestamp: number;
+  text: string;
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
 }
 
 /**
@@ -218,18 +225,13 @@ export class UtilityOperations {
    *
    * @returns 伺服器時間
    */
-  async getServerTime(): Promise<{ timestamp: number; datetime: string }> {
+  async getServerTime(): Promise<ServerTimeResponse> {
     const response = await sendGetRequest<ServerTimeResponse>(
       this.client,
       '/json/time'
     );
 
-    const date = new Date(response.time * 1000);
-
-    return {
-      timestamp: response.time,
-      datetime: date.toISOString(),
-    };
+    return response;
   }
 
   /**
@@ -246,7 +248,7 @@ export class UtilityOperations {
     const localAfter = Math.floor(Date.now() / 1000);
 
     const localTime = Math.floor((localBefore + localAfter) / 2);
-    return response.time - localTime;
+    return response.timestamp - localTime;
   }
 
   /**

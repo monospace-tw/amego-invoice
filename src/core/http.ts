@@ -115,10 +115,13 @@ export async function sendGetRequest<T>(
 }
 
 /**
- * 判斷是否為簽名相關錯誤
+ * 判斷是否為簽名或時間戳記相關錯誤
  */
 function isSignatureError(code: number): boolean {
-  // 根據 API 文件，簽名錯誤的代碼（需要根據實際 API 調整）
-  const signatureErrorCodes = [2, 3]; // 假設 2 是簽名錯誤，3 是時間錯誤
+  // 根據 API 文件，簽名和時間戳記錯誤的代碼
+  // 2: 簽名錯誤
+  // 3: 時間錯誤
+  // 15: time(時間戳記)錯誤
+  const signatureErrorCodes = [2, 3, 15];
   return signatureErrorCodes.includes(code);
 }

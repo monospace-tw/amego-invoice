@@ -8,6 +8,7 @@ export {
   AmegoNetworkError,
   AmegoValidationError,
   AmegoTimeoutError,
+  RateLimitExceededError,
 } from './errors.js';
 
 // Types - Common
