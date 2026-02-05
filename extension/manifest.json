@@ -2,7 +2,7 @@
   "manifest_version": "0.2",
   "name": "amego-invoice",
   "display_name": "Taiwan E-Invoice (Amego)",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Taiwan e-invoice operations via Amego API - query companies, create/cancel invoices, and more",
   "long_description": "A complete Taiwan e-invoice SDK for Amego (光貿電子發票加值中心). Features include:\n\n- Query company name by tax ID (統一編號)\n- Create B2B/B2C e-invoices\n- Query invoice status and details\n- Cancel invoices\n- Validate mobile barcodes\n- Check lottery results\n- And more...",
   "author": {

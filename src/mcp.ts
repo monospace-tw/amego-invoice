@@ -16,7 +16,7 @@ import type { TaxType } from './types/common.js';
 // Create MCP server
 const server = new McpServer({
   name: 'amego-invoice',
-  version: '1.4.0',
+  version: '1.4.1',
 });
 
 // Get config from environment variables
