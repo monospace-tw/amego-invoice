@@ -8,8 +8,8 @@ import { calculateInvoiceAmounts } from './calculators/tax.js';
 import type { CreateInvoiceRequest, ProductItem } from './types/invoice.js';
 import type { TaxType } from './types/common.js';
 
-// 載入 .env 檔案
-config();
+// 載入 .env 檔案（靜默模式）
+config({ debug: false });
 
 const program = new Command();
 
