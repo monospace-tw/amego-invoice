@@ -1,0 +1,64 @@
+{
+  "name": "@trunkstudio/amego-invoice",
+  "version": "1.0.0",
+  "description": "Taiwan E-Invoice SDK for Amego (光貿電子發票加值中心)",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "npm run build:esm && npm run build:cjs && npm run build:cjs:fixup",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:cjs:fixup": "echo '{\"type\": \"commonjs\"}' > dist/cjs/package.json",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build && npm run test:run",
+    "publish:npm": "npm publish --access public"
+  },
+  "keywords": [
+    "taiwan",
+    "e-invoice",
+    "einvoice",
+    "amego",
+    "invoice",
+    "發票",
+    "電子發票",
+    "光貿"
+  ],
+  "author": "TrunkStudio",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/monospace-tw/amego-invoice.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0",
+    "@types/node": "^20.0.0"
+  }
+}
