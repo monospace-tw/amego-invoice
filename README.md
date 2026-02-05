@@ -1,19 +1,19 @@
-# @trunkstudio/amego-invoice
+# @monospace-tw/amego-invoice
 
 Taiwan E-Invoice SDK for Amego (光貿電子發票加值中心)
 
-[![npm version](https://badge.fury.io/js/%40trunkstudio%2Famego-invoice.svg)](https://badge.fury.io/js/%40trunkstudio%2Famego-invoice)
+[![npm version](https://badge.fury.io/js/%40monospace-tw%2Famego-invoice.svg)](https://badge.fury.io/js/%40monospace-tw%2Famego-invoice)
 
 ## Installation
 
 ```bash
-npm install @trunkstudio/amego-invoice
+npm install @monospace-tw/amego-invoice
 ```
 
 ## Quick Start
 
 ```typescript
-import { AmegoClient } from '@trunkstudio/amego-invoice';
+import { AmegoClient } from '@monospace-tw/amego-invoice';
 
 // 初始化客戶端
 const client = new AmegoClient({
@@ -121,7 +121,7 @@ import {
   prepareInvoiceData,
   toExclusive,
   toInclusive,
-} from '@trunkstudio/amego-invoice';
+} from '@monospace-tw/amego-invoice';
 
 // 自動計算發票金額
 const amounts = calculateInvoiceAmounts(items, { buyerHasTaxId: true });
@@ -146,7 +146,7 @@ import {
   validateMobileBarcode,
   validateInvoiceData,
   createInvoiceRequestSchema,
-} from '@trunkstudio/amego-invoice';
+} from '@monospace-tw/amego-invoice';
 
 // 驗證統編
 const taxIdResult = validateTaxId('28080623');
@@ -169,7 +169,7 @@ import {
   AmegoNetworkError,
   AmegoValidationError,
   AmegoTimeoutError,
-} from '@trunkstudio/amego-invoice';
+} from '@monospace-tw/amego-invoice';
 
 try {
   await client.invoice.create(data);

@@ -1,5 +1,5 @@
 {
-  "name": "@trunkstudio/amego-invoice",
+  "name": "@monospace-tw/amego-invoice",
   "version": "1.0.0",
   "description": "Taiwan E-Invoice SDK for Amego (光貿電子發票加值中心)",
   "type": "module",

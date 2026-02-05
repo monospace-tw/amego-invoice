@@ -12,7 +12,7 @@ import { AmegoValidationError } from './errors.js';
  *
  * @example
  * ```typescript
- * import { AmegoClient } from '@trunkstudio/amego-invoice';
+ * import { AmegoClient } from '@monospace-tw/amego-invoice';
  *
  * const client = new AmegoClient({
  *   taxId: '12345678',
