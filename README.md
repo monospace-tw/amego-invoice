@@ -59,6 +59,8 @@ console.log('發票號碼:', invoice.invoice_number);
 - 客戶端請求頻率限制
 - 批次操作支援
 - 可配置的請求日誌
+- CLI 命令列工具
+- MCP Server（支援 Claude Desktop 等 AI 助手）
 
 ## API Reference
 
@@ -298,6 +300,71 @@ npx @monospace-tw/amego-invoice invoice list --limit 10
 export AMEGO_TAX_ID=12345678
 export AMEGO_APP_KEY=sHeq7t8G1wiQvhAuIM27
 ```
+
+## MCP Server
+
+支援 [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)，讓 AI 助手（如 Claude）直接操作電子發票。
+
+### Claude Desktop 設定
+
+編輯 `~/.config/Claude/claude_desktop_config.json`（macOS）或 `%APPDATA%\Claude\claude_desktop_config.json`（Windows）：
+
+```json
+{
+  "mcpServers": {
+    "amego-invoice": {
+      "command": "npx",
+      "args": ["-y", "@monospace-tw/amego-invoice", "mcp"],
+      "env": {
+        "AMEGO_TAX_ID": "你的統編",
+        "AMEGO_APP_KEY": "你的AppKey"
+      }
+    }
+  }
+}
+```
+
+或使用本地安裝：
+
+```json
+{
+  "mcpServers": {
+    "amego-invoice": {
+      "command": "node",
+      "args": ["/path/to/node_modules/@monospace-tw/amego-invoice/dist/esm/mcp.js"],
+      "env": {
+        "AMEGO_TAX_ID": "你的統編",
+        "AMEGO_APP_KEY": "你的AppKey"
+      }
+    }
+  }
+}
+```
+
+### MCP 工具列表
+
+| Tool | Description |
+|------|-------------|
+| `query_company` | 查詢公司名稱（輸入統一編號） |
+| `validate_tax_id` | 驗證統一編號格式（本地驗證） |
+| `validate_barcode` | 驗證手機條碼 |
+| `create_invoice` | 開立電子發票 |
+| `get_invoice_status` | 查詢發票狀態 |
+| `get_invoice_detail` | 查詢發票明細 |
+| `cancel_invoice` | 作廢發票 |
+| `list_invoices` | 發票列表 |
+| `get_server_time` | 取得伺服器時間 |
+| `get_track_info` | 查詢字軌資訊 |
+| `check_lottery` | 查詢發票中獎 |
+
+### 使用範例
+
+設定完成後，可以直接對 Claude 說：
+
+- 「查詢統編 22099131 的公司名稱」
+- 「幫我開一張發票給消費者，商品是咖啡 2 杯 120 元」
+- 「查詢發票 AB12345678 的狀態」
+- 「列出最近的發票」
 
 ## Examples
 
