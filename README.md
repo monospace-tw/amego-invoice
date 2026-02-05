@@ -55,6 +55,10 @@ console.log('發票號碼:', invoice.invoice_number);
 - 內建稅額計算工具
 - 資料驗證 (Zod schemas)
 - 自動時間同步與簽名
+- 指數退避重試機制
+- 客戶端請求頻率限制
+- 批次操作支援
+- 可配置的請求日誌
 
 ## API Reference
 
@@ -67,6 +71,45 @@ const client = new AmegoClient({
   baseUrl?: string;        // API 網址 (預設: https://invoice-api.amego.tw)
   timeout?: number;        // 逾時時間 ms (預設: 30000)
   skipTimeSync?: boolean;  // 跳過時間同步 (預設: false)
+  retry?: RetryConfig | false;     // 重試設定
+  rateLimit?: RateLimitConfig | false; // 頻率限制設定
+  logger?: LogConfig;      // 日誌設定
+});
+```
+
+### 進階設定範例
+
+```typescript
+const client = new AmegoClient({
+  taxId: '12345678',
+  appKey: 'your-app-key',
+  // 重試設定
+  retry: {
+    maxRetries: 5,         // 最大重試次數 (預設: 3)
+    baseDelay: 2000,       // 基礎延遲 ms (預設: 1000)
+    maxDelay: 60000,       // 最大延遲 ms (預設: 30000)
+    retryableErrors: [500, 502, 503], // 可重試的 API 錯誤碼
+    retryNetworkErrors: true, // 重試網路錯誤 (預設: true)
+  },
+  // 頻率限制設定
+  rateLimit: {
+    requestsPerSecond: 5,  // 每秒請求數 (預設: 10)
+    burstSize: 10,         // 突發容量 (預設: requestsPerSecond * 2)
+    queueRequests: true,   // 佇列等待 (預設: true)
+    maxQueueSize: 50,      // 最大佇列長度 (預設: 100)
+  },
+  // 日誌設定
+  logger: {
+    level: 'debug',        // 日誌等級: debug | info | warn | error | none
+    maskSensitiveData: true, // 遮蔽敏感資料 (預設: true)
+  },
+});
+
+// 停用重試
+const noRetryClient = new AmegoClient({
+  taxId: '12345678',
+  appKey: 'your-app-key',
+  retry: false,
 });
 ```
 
@@ -84,6 +127,7 @@ const client = new AmegoClient({
 | `list(options)` | 發票列表 |
 | `downloadPdf(invoiceNumber)` | 下載發票 PDF |
 | `getPrintData(invoiceNumber, options)` | 取得列印資料 |
+| `createMany(invoices, config?)` | 批次開立發票 |
 
 ### 折讓操作 (client.allowance)
 
@@ -97,6 +141,7 @@ const client = new AmegoClient({
 | `list(options)` | 折讓列表 |
 | `downloadPdf(allowanceNumber)` | 下載折讓 PDF |
 | `getPrintData(allowanceNumber, options)` | 取得列印資料 |
+| `createMany(allowances, config?)` | 批次開立折讓 |
 
 ### 工具操作 (client.utility)
 
@@ -110,6 +155,39 @@ const client = new AmegoClient({
 | `getServerTime()` | 取得伺服器時間 |
 | `getInvoiceNumbers(count, trackCode?)` | 字軌取號 |
 | `checkNumberStatus(invoiceNumber)` | 檢查號碼狀態 |
+
+## Batch Operations
+
+批次操作支援並發控制和進度回報：
+
+```typescript
+// 批次開立發票
+const invoices = [
+  { OrderId: 'A001', /* ... */ },
+  { OrderId: 'A002', /* ... */ },
+  { OrderId: 'A003', /* ... */ },
+];
+
+const result = await client.invoice.createMany(invoices, {
+  concurrency: 3,      // 並發數 (預設: 5)
+  stopOnError: false,  // 錯誤時停止 (預設: false)
+  onProgress: (progress) => {
+    console.log(`${progress.completed}/${progress.total} 完成`);
+    if (progress.current) {
+      console.log(`處理中: ${progress.current}`);
+    }
+  },
+});
+
+console.log('成功:', result.successful.length);
+console.log('失敗:', result.failed.length);
+
+// 處理失敗的項目
+for (const fail of result.failed) {
+  console.error('失敗的訂單:', fail.input);
+  console.error('錯誤:', fail.error.message);
+}
+```
 
 ## Tax Calculator
 
@@ -169,6 +247,7 @@ import {
   AmegoNetworkError,
   AmegoValidationError,
   AmegoTimeoutError,
+  RateLimitExceededError,
 } from '@monospace-tw/amego-invoice';
 
 try {
@@ -182,6 +261,8 @@ try {
     console.error('驗證錯誤:', error.errors);
   } else if (error instanceof AmegoTimeoutError) {
     console.error('逾時:', error.timeout);
+  } else if (error instanceof RateLimitExceededError) {
+    console.error('頻率限制:', error.retryAfter, 'ms 後重試');
   }
 }
 ```
