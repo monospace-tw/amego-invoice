@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 
+import { config } from 'dotenv';
 import { Command } from 'commander';
 import { AmegoClient } from './client.js';
 import { validateTaxId, validateMobileBarcode } from './validators/index.js';
 import { calculateInvoiceAmounts } from './calculators/tax.js';
 import type { CreateInvoiceRequest, ProductItem } from './types/invoice.js';
 import type { TaxType } from './types/common.js';
+
+// 載入 .env 檔案
+config();
 
 const program = new Command();
 
