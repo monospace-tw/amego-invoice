@@ -8,5 +8,6 @@
     "sourceMap": true,
     "outDir": "./dist/cjs"
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["src/mcp.ts"]
 }
