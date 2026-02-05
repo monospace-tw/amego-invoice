@@ -31,6 +31,8 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:cjs:fixup": "echo '{\"type\": \"commonjs\"}' > dist/cjs/package.json",
+    "build:mcpb": "npm run build:mcpb:bundle && cd extension && mcpb pack && mv extension.mcpb ../amego-invoice-$(node -p \"require('./manifest.json').version\").mcpb",
+    "build:mcpb:bundle": "esbuild src/mcp.ts --bundle --platform=node --target=node18 --format=cjs --outfile=extension/server/mcp.tmp.js --minify && echo '#!/usr/bin/env node' > extension/server/mcp.js && tail -n +2 extension/server/mcp.tmp.js >> extension/server/mcp.js && rm extension/server/mcp.tmp.js && chmod +x extension/server/mcp.js",
     "test": "vitest",
     "test:run": "vitest run",
     "clean": "rm -rf dist",
@@ -68,6 +70,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "esbuild": "^0.27.2",
     "typescript": "^5.3.0",
     "vitest": "^1.0.0"
   }

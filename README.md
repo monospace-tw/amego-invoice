@@ -305,7 +305,17 @@ export AMEGO_APP_KEY=sHeq7t8G1wiQvhAuIM27
 
 支援 [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)，讓 AI 助手（如 Claude）直接操作電子發票。
 
-### Claude Desktop 設定
+### 方式一：一鍵安裝 (.mcpb)
+
+下載 [amego-invoice-1.4.0.mcpb](https://github.com/monospace-tw/amego-invoice/releases/latest) 後雙擊安裝，Claude Desktop 會提示輸入：
+- 統一編號 (Tax ID)
+- APP Key
+
+測試環境可使用：
+- Tax ID: `12345678`
+- APP Key: `sHeq7t8G1wiQvhAuIM27`
+
+### 方式二：手動設定 Claude Desktop
 
 編輯 `~/.config/Claude/claude_desktop_config.json`（macOS）或 `%APPDATA%\Claude\claude_desktop_config.json`（Windows）：
 

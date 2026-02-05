@@ -1,0 +1,99 @@
+{
+  "manifest_version": "0.2",
+  "name": "amego-invoice",
+  "display_name": "Taiwan E-Invoice (Amego)",
+  "version": "1.4.0",
+  "description": "Taiwan e-invoice operations via Amego API - query companies, create/cancel invoices, and more",
+  "long_description": "A complete Taiwan e-invoice SDK for Amego (光貿電子發票加值中心). Features include:\n\n- Query company name by tax ID (統一編號)\n- Create B2B/B2C e-invoices\n- Query invoice status and details\n- Cancel invoices\n- Validate mobile barcodes\n- Check lottery results\n- And more...",
+  "author": {
+    "name": "Monospace Taiwan",
+    "email": "dev@monospace.tw"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/monospace-tw/amego-invoice"
+  },
+  "homepage": "https://github.com/monospace-tw/amego-invoice",
+  "license": "MIT",
+  "keywords": [
+    "taiwan",
+    "e-invoice",
+    "einvoice",
+    "amego",
+    "invoice",
+    "tax"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "server/mcp.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/mcp.js"],
+      "env": {
+        "AMEGO_TAX_ID": "${user_config.tax_id}",
+        "AMEGO_APP_KEY": "${user_config.app_key}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "query_company",
+      "description": "Query company name by Taiwan tax ID (統一編號)"
+    },
+    {
+      "name": "validate_tax_id",
+      "description": "Validate Taiwan tax ID format locally"
+    },
+    {
+      "name": "validate_barcode",
+      "description": "Validate Taiwan mobile barcode"
+    },
+    {
+      "name": "create_invoice",
+      "description": "Create Taiwan e-invoice"
+    },
+    {
+      "name": "get_invoice_status",
+      "description": "Get invoice status"
+    },
+    {
+      "name": "get_invoice_detail",
+      "description": "Get invoice detail"
+    },
+    {
+      "name": "cancel_invoice",
+      "description": "Cancel invoice"
+    },
+    {
+      "name": "list_invoices",
+      "description": "List invoices"
+    },
+    {
+      "name": "get_server_time",
+      "description": "Get Amego server time"
+    },
+    {
+      "name": "get_track_info",
+      "description": "Get invoice track info"
+    },
+    {
+      "name": "check_lottery",
+      "description": "Check invoice lottery result"
+    }
+  ],
+  "user_config": {
+    "tax_id": {
+      "type": "string",
+      "title": "統一編號 (Tax ID)",
+      "description": "Your company's Taiwan tax ID (8 digits). Test: 12345678",
+      "required": true
+    },
+    "app_key": {
+      "type": "string",
+      "title": "APP Key",
+      "description": "Your Amego API key. Test: sHeq7t8G1wiQvhAuIM27",
+      "required": true,
+      "sensitive": true
+    }
+  }
+}
